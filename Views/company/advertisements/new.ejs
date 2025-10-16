@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/css/main.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+    <%- include('../../partials/header-pro') %>
+    
+    <div class="container" style="padding: 2rem; max-width: 900px; margin: 0 auto;">
+        <div class="dashboard-header" style="margin-bottom: 2rem;">
+            <a href="/company/advertisements" class="btn btn-outline btn-sm" style="margin-bottom: 1rem;">
+                <i data-lucide="arrow-left" style="width: 16px; height: 16px;"></i>
+                Retour à la liste
+            </a>
+            <h1 style="font-size: 32px; font-weight: 700; color: var(--gray-900); margin-bottom: 0.5rem;">
+                Créer une offre d'emploi
+            </h1>
+            <p style="color: var(--gray-600); font-size: 16px;">
+                Remplissez le formulaire ci-dessous pour publier une nouvelle offre
+            </p>
+        </div>
+
+        <% if (error) { %>
+            <div class="alert alert-error" style="margin-bottom: 2rem;"><%= error %></div>
+        <% } %>
+
+        <div class="card">
+            <form action="/company/advertisements" method="POST" class="form">
+                <div class="form-group">
+                    <label class="form-label" for="title">
+                        <i data-lucide="briefcase" style="width: 16px; height: 16px;"></i>
+                        Titre du poste *
+                    </label>
+                    <input type="text" id="title" name="title" class="form-input" required placeholder="Ex: Développeur Full Stack Senior">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="short_description">
+                        <i data-lucide="file-text" style="width: 16px; height: 16px;"></i>
+                        Description courte *
+                    </label>
+                    <textarea id="short_description" name="short_description" class="form-textarea" required placeholder="Une description courte de 1-2 phrases" style="min-height: 80px;"></textarea>
+                    <small style="color: var(--gray-500); font-size: 13px;">Cette description apparaîtra dans les résultats de recherche</small>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="full_description">
+                        <i data-lucide="align-left" style="width: 16px; height: 16px;"></i>
+                        Description complète *
+                    </label>
+                    <textarea id="full_description" name="full_description" class="form-textarea" required placeholder="Description détaillée du poste, responsabilités, etc."></textarea>
+                </div>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem;">
+                    <div class="form-group">
+                        <label class="form-label" for="location">
+                            <i data-lucide="map-pin" style="width: 16px; height: 16px;"></i>
+                            Localisation
+                        </label>
+                        <input type="text" id="location" name="location" class="form-input" placeholder="Paris, Lyon, Remote...">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="contract_type">
+                            <i data-lucide="file-signature" style="width: 16px; height: 16px;"></i>
+                            Type de contrat
+                        </label>
+                        <select id="contract_type" name="contract_type" class="form-select">
+                            <option value="" class="default-option">Sélectionner</option>
+                            <option value="CDI">CDI - Contrat à durée indéterminée</option>
+                            <option value="CDD">CDD - Contrat à durée déterminée</option>
+                            <option value="Stage">Stage</option>
+                            <option value="Alternance">Alternance</option>
+                            <option value="Freelance">Freelance / Indépendant</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="working_time">
+                            <i data-lucide="clock" style="width: 16px; height: 16px;"></i>
+                            Temps de travail
+                        </label>
+                        <select id="working_time" name="working_time" class="form-select">
+                            <option value="" class="default-option">Sélectionner</option>
+                            <option value="Temps plein">Temps plein (35h+)</option>
+                            <option value="Temps partiel">Temps partiel (-35h)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                    <div class="form-group">
+                        <label class="form-label" for="salary_min">
+                            <i data-lucide="euro" style="width: 16px; height: 16px;"></i>
+                            Salaire minimum (€/an)
+                        </label>
+                        <input type="number" id="salary_min" name="salary_min" class="form-input" placeholder="35000" min="0" step="1000">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="salary_max">
+                            <i data-lucide="euro" style="width: 16px; height: 16px;"></i>
+                            Salaire maximum (€/an)
+                        </label>
+                        <input type="number" id="salary_max" name="salary_max" class="form-input" placeholder="45000" min="0" step="1000">
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 2rem; padding-top: 2rem; border-top: 1px solid var(--gray-200);">
+                    <a href="/company/advertisements" class="btn btn-outline">Annuler</a>
+                    <button type="submit" class="btn btn-primary">
+                        <i data-lucide="check" style="width: 18px; height: 18px;"></i>
+                        Créer l'offre
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="/js/page-loader.js"></script>
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>
+

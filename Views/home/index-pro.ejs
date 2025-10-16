@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/css/main.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+    <%- include('../partials/header-pro') %>
+    
+    <% if (success) { %>
+        <div style="padding: 1rem 2rem; max-width: 1400px; margin: 0 auto;">
+            <div class="alert alert-success"><%= success %></div>
+        </div>
+    <% } %>
+    <% if (error) { %>
+        <div style="padding: 1rem 2rem; max-width: 1400px; margin: 0 auto;">
+            <div class="alert alert-error"><%= error %></div>
+        </div>
+    <% } %>
+    
+    <% if (advertisements.length === 0) { %>
+        <div class="container" style="padding: 4rem 2rem; text-align: center;">
+            <h1 style="font-size: 32px; font-weight: 700; margin-bottom: 1rem;">Aucune offre disponible</h1>
+            <p style="color: var(--gray-600); font-size: 16px;">Revenez plus tard pour découvrir de nouvelles opportunités.</p>
+        </div>
+    <% } else { %>
+        <div class="two-column-layout">
+            <!-- Liste des annonces -->
+            <div class="jobs-list-column">
+                <div class="search-results-header">
+                    <h2 class="results-count">
+                        <% if (search || location || contract_type || working_time || salary_min || salary_max) { %>
+                            <%= totalResults %> offre<%= totalResults > 1 ? 's' : '' %> trouvée<%= totalResults > 1 ? 's' : '' %>
+                        <% } else { %>
+                            <%= totalResults %> offre<%= totalResults > 1 ? 's' : '' %> d'emploi
+                        <% } %>
+                    </h2>
+                    <% if (activeFiltersCount > 0) { %>
+                        <div class="active-filters-summary">
+                            <i data-lucide="filter" style="width: 16px; height: 16px;"></i>
+                            <%= activeFiltersCount %> filtre<%= activeFiltersCount > 1 ? 's' : '' %> actif<%= activeFiltersCount > 1 ? 's' : '' %>
+                        </div>
+                    <% } %>
+                </div>
+                
+                <% advertisements.forEach((ad, index) => { %>
+                    <div class="job-card <%= index === 0 ? 'active' : '' %>" 
+                         data-job-id="<%= ad.id %>"
+                         onclick="loadJobDetails(<%= ad.id %>, this)">
+                        <div class="job-card-header">
+                            <div>
+                                <h3 class="job-card-title"><%= ad.title %></h3>
+                                <p class="job-card-company"><%= ad.company_name %></p>
+                            </div>
+                        </div>
+                        <p style="font-size: 14px; color: var(--gray-600); margin-bottom: 0.75rem; line-height: 1.5;">
+                            <%= ad.short_description ? ad.short_description.substring(0, 120) : '' %><%= ad.short_description && ad.short_description.length > 120 ? '...' : '' %>
+                        </p>
+                        <div class="job-card-meta">
+                            <% if (ad.location) { %>
+                                <span class="job-badge"><i data-lucide="map-pin" style="width: 14px; height: 14px;"></i> <%= ad.location %></span>
+                            <% } %>
+                            <% if (ad.contract_type) { %>
+                                <span class="job-badge job-badge-primary"><i data-lucide="briefcase" style="width: 14px; height: 14px;"></i> <%= ad.contract_type %></span>
+                            <% } %>
+                            <% if (ad.working_time) { %>
+                                <span class="job-badge job-badge-secondary"><i data-lucide="clock" style="width: 14px; height: 14px;"></i> <%= ad.working_time %></span>
+                            <% } %>
+                        </div>
+                    </div>
+                <% }) %>
+                
+                <!-- Pagination -->
+                <% if (totalPages > 1) { %>
+                    <div style="padding: 1.5rem; border-top: 1px solid var(--gray-200); background: var(--white);">
+                        <div style="display: flex; justify-content: center; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                            <% if (currentPage > 1) { %>
+                                <a href="?page=<%= currentPage - 1 %>" class="btn btn-outline btn-sm">
+                                    <i data-lucide="chevron-left" style="width: 14px; height: 14px;"></i>
+                                    Précédent
+                                </a>
+                            <% } %>
+                            
+                            <% for (let i = 1; i <= totalPages; i++) { %>
+                                <% if (i === currentPage) { %>
+                                    <span class="btn btn-primary btn-sm"><%= i %></span>
+                                <% } else if (Math.abs(i - currentPage) <= 2 || i === 1 || i === totalPages) { %>
+                                    <a href="?page=<%= i %>" class="btn btn-outline btn-sm"><%= i %></a>
+                                <% } else if (Math.abs(i - currentPage) === 3) { %>
+                                    <span style="padding: 0 0.5rem; color: var(--gray-400);">...</span>
+                                <% } %>
+                            <% } %>
+                            
+                            <% if (currentPage < totalPages) { %>
+                                <a href="?page=<%= currentPage + 1 %>" class="btn btn-outline btn-sm">
+                                    Suivant
+                                    <i data-lucide="chevron-right" style="width: 14px; height: 14px;"></i>
+                                </a>
+                            <% } %>
+                        </div>
+                        <p style="text-align: center; margin-top: 1rem; font-size: 14px; color: var(--gray-600);">
+                            Page <%= currentPage %> sur <%= totalPages %>
+                        </p>
+                    </div>
+                <% } %>
+            </div>
+            
+            <!-- Détails de l'annonce -->
+            <div class="job-details-column" id="jobDetailsColumn">
+                <% if (advertisements.length > 0) { %>
+                    <% const firstAd = advertisements[0]; %>
+                    <div class="job-details-header">
+                        <h1 class="job-details-title"><%= firstAd.title %></h1>
+                        <p class="job-details-company"><%= firstAd.company_name %></p>
+                        <div class="job-details-meta">
+                            <% if (firstAd.location) { %>
+                                <span class="job-badge"><i data-lucide="map-pin" style="width: 14px; height: 14px;"></i> <%= firstAd.location %></span>
+                            <% } %>
+                            <% if (firstAd.contract_type) { %>
+                                <span class="job-badge job-badge-primary"><i data-lucide="briefcase" style="width: 14px; height: 14px;"></i> <%= firstAd.contract_type %></span>
+                            <% } %>
+                            <% if (firstAd.working_time) { %>
+                                <span class="job-badge job-badge-secondary"><i data-lucide="clock" style="width: 14px; height: 14px;"></i> <%= firstAd.working_time %></span>
+                            <% } %>
+                        </div>
+                    </div>
+                    
+                    <div class="job-details-actions">
+                        <button class="btn btn-primary btn-lg" onclick="showApplyModal(<%= firstAd.id %>)">
+                            Postuler à cette offre
+                        </button>
+                        <a href="/advertisements/<%= firstAd.id %>" class="btn btn-outline">En savoir plus</a>
+                    </div>
+                    
+                    <div class="job-details-section">
+                        <h2 class="job-details-section-title">Description du poste</h2>
+                        <div class="job-details-section-content"><%= firstAd.full_description %></div>
+                    </div>
+                    
+                    <% if (firstAd.salary_min || firstAd.salary_max) { %>
+                        <div class="job-details-section">
+                            <h2 class="job-details-section-title">Rémunération</h2>
+                            <div class="job-details-section-content">
+                                <% if (firstAd.salary_min && firstAd.salary_max) { %>
+                                    <%= firstAd.salary_min %> € - <%= firstAd.salary_max %> € par an
+                                <% } else if (firstAd.salary_min) { %>
+                                    À partir de <%= firstAd.salary_min %> € par an
+                                <% } else { %>
+                                    Jusqu'à <%= firstAd.salary_max %> € par an
+                                <% } %>
+                            </div>
+                        </div>
+                    <% } %>
+                <% } %>
+            </div>
+        </div>
+    <% } %>
+    
+    <!-- Modal de candidature -->
+    <div id="applyModal" class="hidden">
+        <div class="modal-overlay" onclick="closeApplyModal()">
+            <div class="modal-container" onclick="event.stopPropagation()">
+                <div class="modal-header">
+                    <h2 class="modal-title">Postuler à cette offre</h2>
+                </div>
+                <form action="/applications" method="POST">
+                    <input type="hidden" name="advertisement_id" id="applyAdId">
+                    
+                    <% if (!user || user.role !== 'candidate') { %>
+                        <div class="form-group">
+                            <label class="form-label">Prénom *</label>
+                            <input type="text" name="first_name" class="form-input" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Nom *</label>
+                            <input type="text" name="last_name" class="form-input" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Email *</label>
+                            <input type="email" name="email" class="form-input" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Téléphone *</label>
+                            <input type="tel" name="phone" class="form-input" required>
+                        </div>
+                    <% } %>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Message de motivation *</label>
+                        <textarea name="message" class="form-textarea" required></textarea>
+                    </div>
+                    
+                    <div class="modal-actions">
+                        <button type="button" onclick="closeApplyModal()" class="btn btn-outline w-full">Annuler</button>
+                        <button type="submit" class="btn btn-primary w-full">Envoyer ma candidature</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <script src="/js/page-loader.js"></script>
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+        
+        let currentJobId = null;
+        
+        function loadJobDetails(jobId, cardElement) {
+            // Update active state
+            document.querySelectorAll('.job-card').forEach(card => card.classList.remove('active'));
+            cardElement.classList.add('active');
+            
+            currentJobId = jobId;
+            
+            const detailsColumn = document.getElementById('jobDetailsColumn');
+            
+            // Smooth scroll to top of details column
+            detailsColumn.scrollTo({ top: 0, behavior: 'smooth' });
+            
+            // Step 1: Fade out current content
+            detailsColumn.classList.add('fade-out');
+            
+            setTimeout(() => {
+                // Step 2: Show skeleton loader
+                detailsColumn.innerHTML = `
+                    <div class="skeleton-header">
+                        <div class="skeleton-loader skeleton-title"></div>
+                        <div class="skeleton-loader skeleton-subtitle"></div>
+                        <div class="skeleton-badges">
+                            <div class="skeleton-loader skeleton-badge"></div>
+                            <div class="skeleton-loader skeleton-badge"></div>
+                            <div class="skeleton-loader skeleton-badge"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="skeleton-actions">
+                        <div class="skeleton-loader skeleton-button"></div>
+                        <div class="skeleton-loader skeleton-button" style="flex: 0.5;"></div>
+                    </div>
+                    
+                    <div class="skeleton-section">
+                        <div class="skeleton-loader skeleton-section-title"></div>
+                        <div class="skeleton-loader skeleton-text short"></div>
+                        <div class="skeleton-loader skeleton-text long"></div>
+                        <div class="skeleton-loader skeleton-text medium"></div>
+                        <div class="skeleton-loader skeleton-text long"></div>
+                        <div class="skeleton-loader skeleton-text short"></div>
+                    </div>
+                `;
+                
+                detailsColumn.classList.remove('fade-out');
+                detailsColumn.classList.add('fade-in-up');
+                
+                // Step 3: Fetch job details
+                fetch(`/advertisements/${jobId}/details`)
+                    .then(response => response.json())
+                    .then(data => {
+                        setTimeout(() => {
+                            const salaryHtml = data.salary_min || data.salary_max ? `
+                                <div class="job-details-section">
+                                    <h2 class="job-details-section-title">Rémunération</h2>
+                                    <div class="job-details-section-content">
+                                        ${data.salary_min && data.salary_max ? 
+                                            `${data.salary_min} € - ${data.salary_max} € par an` :
+                                            data.salary_min ? 
+                                            `À partir de ${data.salary_min} € par an` :
+                                            `Jusqu'à ${data.salary_max} € par an`
+                                        }
+                                    </div>
+                                </div>
+                            ` : '';
+                            
+                            // Step 4: Fade out skeleton, then show real content
+                            detailsColumn.classList.add('fade-out');
+                            
+                            setTimeout(() => {
+                                detailsColumn.innerHTML = `
+                                    <div class="job-details-header">
+                                        <h1 class="job-details-title">${data.title}</h1>
+                                        <p class="job-details-company">${data.company_name}</p>
+                                        <div class="job-details-meta">
+                                            ${data.location ? `<span class="job-badge"><i data-lucide="map-pin" style="width: 14px; height: 14px;"></i> ${data.location}</span>` : ''}
+                                            ${data.contract_type ? `<span class="job-badge job-badge-primary"><i data-lucide="briefcase" style="width: 14px; height: 14px;"></i> ${data.contract_type}</span>` : ''}
+                                            ${data.working_time ? `<span class="job-badge job-badge-secondary"><i data-lucide="clock" style="width: 14px; height: 14px;"></i> ${data.working_time}</span>` : ''}
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="job-details-actions">
+                                        <button class="btn btn-primary btn-lg" onclick="showApplyModal(${data.id})">
+                                            Postuler à cette offre
+                                        </button>
+                                        <a href="/advertisements/${data.id}" class="btn btn-outline">En savoir plus</a>
+                                    </div>
+                                    
+                                    <div class="job-details-section">
+                                        <h2 class="job-details-section-title">Description du poste</h2>
+                                        <div class="job-details-section-content">${data.full_description}</div>
+                                    </div>
+                                    
+                                    ${salaryHtml}
+                                `;
+                                
+                                detailsColumn.classList.remove('fade-out');
+                                detailsColumn.classList.add('fade-in-up');
+                                
+                                // Re-initialize Lucide icons after content update
+                                lucide.createIcons();
+                            }, 200);
+                        }, 400);
+                    });
+            }, 200);
+        }
+        
+        function showApplyModal(jobId) {
+            currentJobId = jobId;
+            document.getElementById('applyAdId').value = jobId;
+            document.getElementById('applyModal').classList.remove('hidden');
+        }
+        
+        function closeApplyModal() {
+            document.getElementById('applyModal').classList.add('hidden');
+        }
+        
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeApplyModal();
+            }
+        });
+    </script>
+</body>
+</html>
+

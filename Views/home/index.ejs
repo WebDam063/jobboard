@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/css/utility.css">
+</head>
+<body class="bg-gray-50">
+    <%- include('../partials/header') %>
+    
+    <main class="min-h-screen py-8">
+        <%- include('../partials/flash-messages') %>
+        
+        <div class="container">
+            <h1 class="text-4xl font-bold text-center mb-8">Trouvez votre prochain emploi</h1>
+            
+            <% if (advertisements.length === 0) { %>
+                <div class="text-center py-12">
+                    <p class="text-xl text-gray-600">Aucune offre d'emploi disponible pour le moment.</p>
+                </div>
+            <% } else { %>
+                <div class="grid grid-cols-3 gap-6">
+                    <% advertisements.forEach(ad => { %>
+                        <div class="card">
+                            <h2 class="card-title"><%= ad.title %></h2>
+                            <p class="text-sm text-gray-500 mb-2"><%= ad.company_name %></p>
+                            <p class="card-text text-sm"><%= ad.short_description %></p>
+                            
+                            <div class="flex gap-2 mb-4">
+                                <% if (ad.location) { %>
+                                    <span class="badge badge-gray"><%= ad.location %></span>
+                                <% } %>
+                                <% if (ad.contract_type) { %>
+                                    <span class="badge badge-primary"><%= ad.contract_type %></span>
+                                <% } %>
+                            </div>
+                            
+                            <button onclick="showDetails(<%= ad.id %>)" class="btn btn-primary w-full" data-ad-id="<%= ad.id %>">
+                                En savoir plus
+                            </button>
+                        </div>
+                    <% }) %>
+                </div>
+                
+                <%- include('../partials/pagination', { currentPage, totalPages }) %>
+            <% } %>
+        </div>
+        
+        <div id="detailsModal" class="hidden">
+            <div class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center p-4" onclick="closeDetails()">
+                <div class="bg-white rounded-lg p-8 max-w-3xl w-full overflow-auto" style="max-height: 90vh" onclick="event.stopPropagation()">
+                    <div id="detailsContent"></div>
+                    <div class="flex gap-4 mt-6">
+                        <button onclick="closeDetails()" class="btn btn-outline flex-1">Fermer</button>
+                        <button onclick="showApplyForm()" class="btn btn-primary flex-1">Postuler</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="applyModal" class="hidden">
+            <div class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center p-4" onclick="closeApplyForm()">
+                <div class="bg-white rounded-lg p-8 max-w-2xl w-full overflow-auto" style="max-height: 90vh" onclick="event.stopPropagation()">
+                    <h2 class="text-2xl font-bold mb-6">Postuler à cette offre</h2>
+                    <form action="/applications" method="POST">
+                        <input type="hidden" name="advertisement_id" id="applyAdId">
+                        
+                        <% if (!user || user.role !== 'candidate') { %>
+                            <div class="form-group">
+                                <label class="form-label">Prénom</label>
+                                <input type="text" name="first_name" class="form-input" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Nom</label>
+                                <input type="text" name="last_name" class="form-input" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Email</label>
+                                <input type="email" name="email" class="form-input" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Téléphone</label>
+                                <input type="tel" name="phone" class="form-input" required>
+                            </div>
+                        <% } %>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Message de motivation</label>
+                            <textarea name="message" class="form-textarea" required></textarea>
+                        </div>
+                        
+                        <div class="flex gap-4">
+                            <button type="button" onclick="closeApplyForm()" class="btn btn-outline flex-1">Annuler</button>
+                            <button type="submit" class="btn btn-primary flex-1">Envoyer ma candidature</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <%- include('../partials/footer') %>
+    
+    <script src="/js/main.js"></script>
+</body>
+</html>
+

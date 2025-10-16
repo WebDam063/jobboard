@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/css/utility.css">
+</head>
+<body class="bg-gray-50">
+    <%- include('../../partials/header') %>
+    
+    <main class="min-h-screen py-8">
+        <%- include('../../partials/flash-messages') %>
+        
+        <div class="container">
+            <div class="flex justify-between items-center mb-6">
+                <h1 class="text-3xl font-bold">Gestion des annonces</h1>
+                <a href="/admin" class="btn btn-outline">Retour au tableau de bord</a>
+            </div>
+            
+            <div class="bg-white shadow rounded-lg overflow-hidden">
+                <table class="w-full">
+                    <thead class="bg-gray-100 border-b">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">ID</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Titre</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Entreprise</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Lieu</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Statut</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white">
+                        <% advertisements.forEach(ad => { %>
+                            <tr class="border-b">
+                                <td class="px-6 py-4"><%= ad.id %></td>
+                                <td class="px-6 py-4"><%= ad.title %></td>
+                                <td class="px-6 py-4"><%= ad.company_name %></td>
+                                <td class="px-6 py-4"><%= ad.location || '-' %></td>
+                                <td class="px-6 py-4">
+                                    <span class="badge badge-<%= ad.is_active ? 'secondary' : 'gray' %>">
+                                        <%= ad.is_active ? 'Active' : 'Inactive' %>
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <a href="/advertisements/<%= ad.id %>" class="btn btn-primary btn-sm mr-2">Voir</a>
+                                    <form action="/admin/advertisements/<%= ad.id %>/delete" method="POST" style="display: inline;" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette annonce ?')">
+                                        <button type="submit" class="btn btn-danger btn-sm">Supprimer</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        <% }) %>
+                    </tbody>
+                </table>
+            </div>
+            
+            <%- include('../../partials/pagination', { currentPage, totalPages }) %>
+        </div>
+    </main>
+    
+    <%- include('../../partials/footer') %>
+</body>
+</html>
+

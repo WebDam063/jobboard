@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/css/main.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+    <%- include('../../partials/header-pro') %>
+    
+    <div class="main-content">
+        <% if (success) { %>
+            <div style="padding: 1rem 2rem; max-width: 1400px; margin: 0 auto;">
+                <div class="alert alert-success"><%= success %></div>
+            </div>
+        <% } %>
+        <% if (error) { %>
+            <div style="padding: 1rem 2rem; max-width: 1400px; margin: 0 auto;">
+                <div class="alert alert-error"><%= error %></div>
+            </div>
+        <% } %>
+        
+        <div class="container" style="padding: 2rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                <div>
+                    <h1 style="font-size: 28px; font-weight: 700; margin-bottom: 0.25rem;">Gestion des utilisateurs</h1>
+                    <p style="color: var(--gray-600); font-size: 15px;">Liste de tous les comptes utilisateurs</p>
+                </div>
+                <a href="/admin" class="btn btn-outline">
+                    <i data-lucide="arrow-left" style="width: 16px; height: 16px;"></i>
+                    Retour
+                </a>
+            </div>
+            
+            <div style="background: var(--white); border: 1px solid var(--gray-200); border-radius: 8px; overflow: hidden;">
+                <table style="width: 100%; border-collapse: collapse;">
+                    <thead style="background: var(--gray-50); border-bottom: 1px solid var(--gray-200);">
+                        <tr>
+                            <th style="padding: 1rem 1.5rem; text-align: left; font-size: 12px; font-weight: 600; color: var(--gray-600); text-transform: uppercase; letter-spacing: 0.5px;">ID</th>
+                            <th style="padding: 1rem 1.5rem; text-align: left; font-size: 12px; font-weight: 600; color: var(--gray-600); text-transform: uppercase; letter-spacing: 0.5px;">Email</th>
+                            <th style="padding: 1rem 1.5rem; text-align: left; font-size: 12px; font-weight: 600; color: var(--gray-600); text-transform: uppercase; letter-spacing: 0.5px;">Rôle</th>
+                            <th style="padding: 1rem 1.5rem; text-align: left; font-size: 12px; font-weight: 600; color: var(--gray-600); text-transform: uppercase; letter-spacing: 0.5px;">Date création</th>
+                            <th style="padding: 1rem 1.5rem; text-align: left; font-size: 12px; font-weight: 600; color: var(--gray-600); text-transform: uppercase; letter-spacing: 0.5px;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% users.forEach((user, index) => { %>
+                            <tr style="border-bottom: 1px solid var(--gray-200);">
+                                <td style="padding: 1rem 1.5rem; font-size: 15px; color: var(--gray-700);">#<%= user.id %></td>
+                                <td style="padding: 1rem 1.5rem; font-size: 15px; color: var(--gray-900); font-weight: 500;"><%= user.email %></td>
+                                <td style="padding: 1rem 1.5rem;">
+                                    <span class="job-badge <%= user.role === 'admin' ? 'job-badge-accent' : user.role === 'company' ? 'job-badge-secondary' : 'job-badge-primary' %>">
+                                        <%= user.role %>
+                                    </span>
+                                </td>
+                                <td style="padding: 1rem 1.5rem; font-size: 15px; color: var(--gray-700);"><%= new Date(user.created_at).toLocaleDateString('fr-FR') %></td>
+                                <td style="padding: 1rem 1.5rem;">
+                                    <form action="/admin/users/<%= user.id %>/delete" method="POST" style="display: inline;" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet utilisateur ?')">
+                                        <button type="submit" class="btn btn-accent btn-sm">
+                                            <i data-lucide="trash-2" style="width: 14px; height: 14px;"></i>
+                                            Supprimer
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        <% }) %>
+                    </tbody>
+                </table>
+            </div>
+            
+            <% if (totalPages > 1) { %>
+                <div style="display: flex; justify-content: center; gap: 0.5rem; margin-top: 2rem;">
+                    <% if (currentPage > 1) { %>
+                        <a href="?page=<%= currentPage - 1 %>" class="btn btn-outline btn-sm">Précédent</a>
+                    <% } %>
+                    
+                    <% for (let i = 1; i <= totalPages; i++) { %>
+                        <% if (i === currentPage) { %>
+                            <span class="btn btn-primary btn-sm"><%= i %></span>
+                        <% } else if (Math.abs(i - currentPage) <= 2 || i === 1 || i === totalPages) { %>
+                            <a href="?page=<%= i %>" class="btn btn-outline btn-sm"><%= i %></a>
+                        <% } else if (Math.abs(i - currentPage) === 3) { %>
+                            <span style="padding: 0 0.5rem; color: var(--gray-500);">...</span>
+                        <% } %>
+                    <% } %>
+                    
+                    <% if (currentPage < totalPages) { %>
+                        <a href="?page=<%= currentPage + 1 %>" class="btn btn-outline btn-sm">Suivant</a>
+                    <% } %>
+                </div>
+            <% } %>
+        </div>
+    </div>
+    
+    <script src="/js/page-loader.js"></script>
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>
+

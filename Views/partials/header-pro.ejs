@@ -1,0 +1,291 @@
+<header class="header">
+    <div class="header-container">
+        <!-- Logo à gauche -->
+        <a href="/" class="header-logo">JobBoard</a>
+        
+        <!-- Navigation groupée au centre -->
+        <div class="header-center">
+            <nav class="header-nav">
+                <% if (!user || user.role === 'candidate') { %>
+                    <a href="/" class="nav-link">Offres d'emploi</a>
+                <% } %>
+                <% if (user && user.role === 'candidate') { %>
+                    <a href="/applications/my-applications" class="nav-link">Mes candidatures</a>
+                <% } %>
+                <% if (user && user.role === 'company') { %>
+                    <a href="/company/dashboard" class="nav-link">Tableau de bord</a>
+                    <a href="/company/advertisements" class="nav-link">Mes offres</a>
+                    <a href="/company/applications" class="nav-link">Candidatures</a>
+                <% } %>
+                <% if (user && user.role === 'admin') { %>
+                    <a href="/admin" class="nav-link">Administration</a>
+                    <a href="/" class="nav-link">Voir le site</a>
+                <% } %>
+            </nav>
+            
+            <!-- Search Bar (uniquement pour candidats et non-connectés) -->
+            <% if (!user || user.role === 'candidate') { %>
+                <div class="header-search">
+                    <form action="/" method="GET" id="searchForm" class="search-form">
+                        <div class="search-input-wrapper">
+                            <i data-lucide="search" class="search-icon"></i>
+                            <input 
+                                type="text" 
+                                name="search" 
+                                class="search-input" 
+                                placeholder="Rechercher un emploi, une entreprise..."
+                                value="<%= typeof search !== 'undefined' ? search : '' %>"
+                            >
+                        </div>
+                        <button type="button" class="btn btn-outline btn-sm filters-toggle" onclick="toggleFilters()">
+                            <i data-lucide="sliders-horizontal" style="width: 14px; height: 14px;"></i>
+                            Filtres
+                            <% if (typeof activeFiltersCount !== 'undefined' && activeFiltersCount > 0) { %>
+                                <span class="filter-badge"><%= activeFiltersCount %></span>
+                            <% } %>
+                        </button>
+                        
+                        <!-- Hidden inputs for filters -->
+                        <input type="hidden" name="location" value="<%= typeof location !== 'undefined' ? location : '' %>">
+                        <input type="hidden" name="contract_type" value="<%= typeof contract_type !== 'undefined' ? contract_type : '' %>">
+                        <input type="hidden" name="working_time" value="<%= typeof working_time !== 'undefined' ? working_time : '' %>">
+                        <input type="hidden" name="salary_min" value="<%= typeof salary_min !== 'undefined' ? salary_min : '' %>">
+                        <input type="hidden" name="salary_max" value="<%= typeof salary_max !== 'undefined' ? salary_max : '' %>">
+                    </form>
+                </div>
+            <% } %>
+        </div>
+        
+        <!-- Actions à droite -->
+        <div class="header-actions">
+            <% if (user) { %>
+                <% if (user.role === 'company' && user.companyName) { %>
+                    <span class="user-name"><%= user.companyName %></span>
+                <% } else if (user.role === 'admin') { %>
+                    <span class="user-name">Administrateur</span>
+                <% } else { %>
+                    <span class="user-name"><%= user.email %></span>
+                <% } %>
+                <a href="/auth/logout" class="btn btn-outline btn-sm">Déconnexion</a>
+            <% } else { %>
+                <a href="/auth/login" class="btn btn-outline btn-sm">Connexion</a>
+                <div class="register-dropdown">
+                    <button class="btn btn-primary btn-sm" onclick="toggleRegisterMenu(event)">
+                        <i data-lucide="user-plus" style="width: 16px; height: 16px;"></i>
+                        S'inscrire
+                        <i data-lucide="chevron-down" style="width: 14px; height: 14px; transition: transform 0.2s;"></i>
+                    </button>
+                    <div class="register-dropdown-menu hidden" id="registerMenu">
+                        <a href="/auth/register/candidate" class="register-dropdown-item">
+                            <div class="register-option-icon" style="background: rgba(69, 105, 144, 0.1);">
+                                <i data-lucide="briefcase" style="width: 20px; height: 20px; color: var(--primary);"></i>
+                            </div>
+                            <div class="register-option-content">
+                                <div class="register-option-title">Je cherche un emploi</div>
+                                <div class="register-option-desc">Créer un compte candidat</div>
+                            </div>
+                        </a>
+                        <a href="/auth/register/company" class="register-dropdown-item">
+                            <div class="register-option-icon" style="background: rgba(73, 190, 170, 0.1);">
+                                <i data-lucide="building-2" style="width: 20px; height: 20px; color: var(--secondary);"></i>
+                            </div>
+                            <div class="register-option-content">
+                                <div class="register-option-title">Je recrute</div>
+                                <div class="register-option-desc">Créer un compte entreprise</div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            <% } %>
+        </div>
+    </div>
+    
+    <!-- Filters Dropdown -->
+    <div id="filtersDropdown" class="filters-dropdown hidden">
+        <form id="searchForm" method="GET" action="/">
+            <input type="hidden" name="search" value="<%= typeof search !== 'undefined' ? search : '' %>">
+            <div class="filters-dropdown-content">
+            <div class="filters-header">
+                <h3 class="filters-title">
+                    <i data-lucide="sliders-horizontal" style="width: 20px; height: 20px;"></i>
+                    Affinez votre recherche
+                </h3>
+                <button type="button" class="btn-close" onclick="toggleFilters()">
+                    <i data-lucide="x" style="width: 20px; height: 20px;"></i>
+                </button>
+            </div>
+            
+            <div class="filters-grid">
+                <!-- Localisation -->
+                <div class="filter-group">
+                    <label class="filter-label">
+                        <i data-lucide="map-pin" style="width: 16px; height: 16px;"></i>
+                        Localisation
+                    </label>
+                    <input 
+                        type="text" 
+                        class="form-input" 
+                        placeholder="Paris, Lyon, Remote..."
+                        value="<%= typeof location !== 'undefined' ? location : '' %>"
+                        onchange="updateFilter('location', this.value)"
+                    >
+                </div>
+                
+                <!-- Type de contrat -->
+                <div class="filter-group">
+                    <label class="filter-label">
+                        <i data-lucide="briefcase" style="width: 16px; height: 16px;"></i>
+                        Type de contrat
+                    </label>
+                    <select class="form-select" onchange="updateFilter('contract_type', this.value)">
+                        <option value="" class="default-option">Tous les types</option>
+                        <option value="CDI" <%= typeof contract_type !== 'undefined' && contract_type === 'CDI' ? 'selected' : '' %>>CDI - Contrat à durée indéterminée</option>
+                        <option value="CDD" <%= typeof contract_type !== 'undefined' && contract_type === 'CDD' ? 'selected' : '' %>>CDD - Contrat à durée déterminée</option>
+                        <option value="Stage" <%= typeof contract_type !== 'undefined' && contract_type === 'Stage' ? 'selected' : '' %>>Stage</option>
+                        <option value="Alternance" <%= typeof contract_type !== 'undefined' && contract_type === 'Alternance' ? 'selected' : '' %>>Alternance</option>
+                        <option value="Freelance" <%= typeof contract_type !== 'undefined' && contract_type === 'Freelance' ? 'selected' : '' %>>Freelance / Indépendant</option>
+                    </select>
+                </div>
+                
+                <!-- Temps de travail -->
+                <div class="filter-group">
+                    <label class="filter-label">
+                        <i data-lucide="clock" style="width: 16px; height: 16px;"></i>
+                        Temps de travail
+                    </label>
+                    <select class="form-select" onchange="updateFilter('working_time', this.value)">
+                        <option value="" class="default-option">Tous</option>
+                        <option value="Temps plein" <%= typeof working_time !== 'undefined' && working_time === 'Temps plein' ? 'selected' : '' %>>Temps plein (35h+)</option>
+                        <option value="Temps partiel" <%= typeof working_time !== 'undefined' && working_time === 'Temps partiel' ? 'selected' : '' %>>Temps partiel (-35h)</option>
+                    </select>
+                </div>
+                
+                <!-- Salaire -->
+                <div class="filter-group">
+                    <label class="filter-label">
+                        <i data-lucide="euro" style="width: 16px; height: 16px;"></i>
+                        Salaire annuel (€)
+                    </label>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <input 
+                            type="number" 
+                            class="form-input" 
+                            placeholder="Min"
+                            value="<%= typeof salary_min !== 'undefined' ? salary_min : '' %>"
+                            onchange="updateFilter('salary_min', this.value)"
+                        >
+                        <input 
+                            type="number" 
+                            class="form-input" 
+                            placeholder="Max"
+                            value="<%= typeof salary_max !== 'undefined' ? salary_max : '' %>"
+                            onchange="updateFilter('salary_max', this.value)"
+                        >
+                    </div>
+                </div>
+            </div>
+            
+            <div class="filters-footer">
+                <button type="button" class="btn btn-outline" onclick="resetFilters()">
+                    <i data-lucide="rotate-ccw" style="width: 16px; height: 16px;"></i>
+                    Réinitialiser
+                </button>
+                <button type="button" class="btn btn-primary" onclick="applyFilters()">
+                    <i data-lucide="check" style="width: 16px; height: 16px;"></i>
+                    Appliquer les filtres
+                </button>
+            </div>
+            </div>
+        </form>
+    </div>
+    
+    <script>
+        function toggleFilters() {
+            const dropdown = document.getElementById('filtersDropdown');
+            dropdown.classList.toggle('hidden');
+            if (!dropdown.classList.contains('hidden')) {
+                lucide.createIcons();
+            }
+        }
+        
+        function updateFilter(name, value) {
+            const input = document.querySelector(`input[name="${name}"]`);
+            if (input) {
+                input.value = value;
+            }
+        }
+        
+        function applyFilters() {
+            document.getElementById('searchForm').submit();
+        }
+        
+        function resetFilters() {
+            const form = document.getElementById('searchForm');
+            
+            // Reset text and number inputs
+            form.querySelectorAll('input[type="text"], input[type="number"]').forEach(input => {
+                if (input.name !== 'search') {
+                    input.value = '';
+                }
+            });
+            
+            // Reset hidden inputs (except search)
+            form.querySelectorAll('input[type="hidden"]').forEach(input => {
+                if (input.name !== 'search') {
+                    input.value = '';
+                }
+            });
+            
+            // Reset select elements
+            form.querySelectorAll('select').forEach(select => {
+                select.selectedIndex = 0;
+            });
+            
+            form.submit();
+        }
+        
+        // Auto-submit on search input (debounced)
+        let searchTimeout;
+        document.querySelector('.search-input')?.addEventListener('input', function() {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                document.getElementById('searchForm').submit();
+            }, 500);
+        });
+        
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            const dropdown = document.getElementById('filtersDropdown');
+            const toggle = document.querySelector('.filters-toggle');
+            if (!dropdown.contains(e.target) && !toggle.contains(e.target)) {
+                dropdown.classList.add('hidden');
+            }
+        });
+        
+        // Register dropdown menu
+        function toggleRegisterMenu(event) {
+            event.stopPropagation();
+            const menu = document.getElementById('registerMenu');
+            const chevron = event.currentTarget.querySelector('[data-lucide="chevron-down"]');
+            menu.classList.toggle('hidden');
+            if (chevron) {
+                chevron.style.transform = menu.classList.contains('hidden') ? 'rotate(0deg)' : 'rotate(180deg)';
+            }
+            lucide.createIcons();
+        }
+        
+        // Close register menu when clicking outside
+        document.addEventListener('click', function(e) {
+            const registerMenu = document.getElementById('registerMenu');
+            const registerDropdown = document.querySelector('.register-dropdown');
+            if (registerMenu && registerDropdown && !registerDropdown.contains(e.target)) {
+                registerMenu.classList.add('hidden');
+                const chevron = registerDropdown.querySelector('[data-lucide="chevron-down"]');
+                if (chevron) {
+                    chevron.style.transform = 'rotate(0deg)';
+                }
+            }
+        });
+    </script>
+</header>
+

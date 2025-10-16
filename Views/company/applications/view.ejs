@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/css/main.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+    <%- include('../../partials/header-pro') %>
+    
+    <div class="container" style="padding: 2rem; max-width: 900px; margin: 0 auto;">
+        <div class="dashboard-header" style="margin-bottom: 2rem;">
+            <a href="/company/applications" class="btn btn-outline btn-sm" style="margin-bottom: 1rem;">
+                <i data-lucide="arrow-left" style="width: 16px; height: 16px;"></i>
+                Retour à la liste
+            </a>
+            <h1 style="font-size: 32px; font-weight: 700; color: var(--gray-900); margin-bottom: 0.5rem;">
+                Candidature de <%= application.first_name %> <%= application.last_name %>
+            </h1>
+            <p style="color: var(--gray-600); font-size: 16px;">
+                Pour le poste : <%= application.advertisement_title %>
+            </p>
+        </div>
+
+        <% if (success) { %>
+            <div class="alert alert-success" style="margin-bottom: 2rem;"><%= success %></div>
+        <% } %>
+        <% if (error) { %>
+            <div class="alert alert-error" style="margin-bottom: 2rem;"><%= error %></div>
+        <% } %>
+
+        <div class="card" style="margin-bottom: 2rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 1.5rem; border-bottom: 1px solid var(--gray-200); margin-bottom: 1.5rem;">
+                <div>
+                    <span class="badge <%= application.status === 'pending' ? 'badge-warning' : application.status === 'accepted' ? 'badge-success' : 'badge-error' %>">
+                        <%= application.status === 'pending' ? 'En attente' : application.status === 'accepted' ? 'Acceptée' : 'Refusée' %>
+                    </span>
+                    <h2 style="font-size: 20px; font-weight: 600; color: var(--gray-900); margin-bottom: 0.5rem;">
+                        Informations du candidat
+                    </h2>
+                </div>
+                <div style="color: var(--gray-500); font-size: 14px;">
+                    <i data-lucide="calendar"></i>
+                    <%= new Date(application.created_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }) %>
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem; margin-bottom: 2rem;">
+                <div>
+                    <div style="display: flex; align-items: center; gap: 0.5rem; color: var(--gray-500); font-size: 14px; margin-bottom: 0.5rem;">
+                        <i data-lucide="user" style="width: 16px; height: 16px;"></i>
+                        <span>Nom complet</span>
+                    </div>
+                    <div style="font-size: 16px; font-weight: 500; color: var(--gray-900);">
+                        <%= application.first_name %> <%= application.last_name %>
+                    </div>
+                </div>
+
+                <div>
+                    <div style="display: flex; align-items: center; gap: 0.5rem; color: var(--gray-500); font-size: 14px; margin-bottom: 0.5rem;">
+                        <i data-lucide="mail" style="width: 16px; height: 16px;"></i>
+                        <span>Email</span>
+                    </div>
+                    <a href="mailto:<%= application.email %>" style="font-size: 16px; font-weight: 500; color: var(--primary); text-decoration: none;">
+                        <%= application.email %>
+                    </a>
+                </div>
+
+                <div>
+                    <div style="display: flex; align-items: center; gap: 0.5rem; color: var(--gray-500); font-size: 14px; margin-bottom: 0.5rem;">
+                        <i data-lucide="phone" style="width: 16px; height: 16px;"></i>
+                        <span>Téléphone</span>
+                    </div>
+                    <a href="tel:<%= application.phone %>" style="font-size: 16px; font-weight: 500; color: var(--primary); text-decoration: none;">
+                        <%= application.phone || 'Non renseigné' %>
+                    </a>
+                </div>
+
+                <div>
+                    <div style="display: flex; align-items: center; gap: 0.5rem; color: var(--gray-500); font-size: 14px; margin-bottom: 0.5rem;">
+                        <i data-lucide="briefcase" style="width: 16px; height: 16px;"></i>
+                        <span>Poste visé</span>
+                    </div>
+                    <div style="font-size: 16px; font-weight: 500; color: var(--gray-900);">
+                        <%= application.advertisement_title %>
+                    </div>
+                </div>
+            </div>
+
+            <% if (application.message) { %>
+                <div style="padding-top: 1.5rem; border-top: 1px solid var(--gray-200);">
+                    <h3 style="font-size: 16px; font-weight: 600; color: var(--gray-900); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                        <i data-lucide="message-square" style="width: 18px; height: 18px;"></i>
+                        Lettre de motivation
+                    </h3>
+                    <div style="padding: 1.5rem; background: var(--gray-50); border-radius: 6px; color: var(--gray-700); line-height: 1.6; white-space: pre-wrap;">
+<%= application.message %>
+                    </div>
+                </div>
+            <% } %>
+        </div>
+
+        <div class="card">
+            <h3 style="font-size: 18px; font-weight: 600; color: var(--gray-900); margin-bottom: 1.5rem;">
+                Actions
+            </h3>
+            <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                <% if (application.status !== 'accepted') { %>
+                    <form action="/company/applications/<%= application.id %>/status" method="POST">
+                        <input type="hidden" name="status" value="accepted">
+                        <button type="submit" class="btn btn-secondary">
+                            <i data-lucide="check-circle" style="width: 18px; height: 18px;"></i>
+                            Accepter la candidature
+                        </button>
+                    </form>
+                <% } %>
+
+                <% if (application.status !== 'rejected') { %>
+                    <form action="/company/applications/<%= application.id %>/status" method="POST" onsubmit="return confirm('Êtes-vous sûr de vouloir refuser cette candidature ?');">
+                        <input type="hidden" name="status" value="rejected">
+                        <button type="submit" class="btn btn-outline" style="color: var(--accent); border-color: var(--accent);">
+                            <i data-lucide="x-circle" style="width: 18px; height: 18px;"></i>
+                            Refuser la candidature
+                        </button>
+                    </form>
+                <% } %>
+
+                <% if (application.status !== 'pending') { %>
+                    <form action="/company/applications/<%= application.id %>/status" method="POST">
+                        <input type="hidden" name="status" value="pending">
+                        <button type="submit" class="btn btn-outline">
+                            <i data-lucide="rotate-ccw" style="width: 18px; height: 18px;"></i>
+                            Remettre en attente
+                        </button>
+                    </form>
+                <% } %>
+
+                <a href="mailto:<%= application.email %>" class="btn btn-primary">
+                    <i data-lucide="mail" style="width: 18px; height: 18px;"></i>
+                    Contacter par email
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/page-loader.js"></script>
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>
+

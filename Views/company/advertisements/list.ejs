@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/css/main.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+    <%- include('../../partials/header-pro') %>
+    
+    <div class="container" style="padding: 2rem;">
+        <div class="dashboard-header" style="margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <h1 style="font-size: 32px; font-weight: 700; color: var(--gray-900); margin-bottom: 0.5rem;">
+                    Mes offres d'emploi
+                </h1>
+                <p style="color: var(--gray-600); font-size: 16px;">
+                    Gérez vos offres d'emploi
+                </p>
+            </div>
+            <a href="/company/advertisements/new" class="btn btn-primary">
+                <i data-lucide="plus" style="width: 18px; height: 18px;"></i>
+                Nouvelle offre
+            </a>
+        </div>
+
+        <% if (success) { %>
+            <div class="alert alert-success" style="margin-bottom: 2rem;"><%= success %></div>
+        <% } %>
+        <% if (error) { %>
+            <div class="alert alert-error" style="margin-bottom: 2rem;"><%= error %></div>
+        <% } %>
+
+        <% if (advertisements.length === 0) { %>
+            <div class="card" style="text-align: center; padding: 4rem 2rem;">
+                <i data-lucide="briefcase" style="width: 64px; height: 64px; color: var(--gray-300); margin: 0 auto 1rem;"></i>
+                <h2 style="font-size: 24px; font-weight: 600; color: var(--gray-900); margin-bottom: 0.5rem;">
+                    Aucune offre d'emploi
+                </h2>
+                <p style="color: var(--gray-600); margin-bottom: 2rem;">
+                    Commencez par créer votre première offre d'emploi
+                </p>
+                <a href="/company/advertisements/new" class="btn btn-primary">
+                    <i data-lucide="plus"></i>
+                    Créer une offre
+                </a>
+            </div>
+        <% } else { %>
+            <div class="card">
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Titre</th>
+                                <th>Localisation</th>
+                                <th>Type de contrat</th>
+                                <th>Statut</th>
+                                <th>Date de création</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% advertisements.forEach(ad => { %>
+                                <tr>
+                                    <td>
+                                        <div style="font-weight: 600; color: var(--gray-900);"><%= ad.title %></div>
+                                        <div style="font-size: 14px; color: var(--gray-500); margin-top: 0.25rem;">
+                                            <%= ad.short_description ? ad.short_description.substring(0, 60) + '...' : '' %>
+                                        </div>
+                                    </td>
+                                    <td><%= ad.location || '-' %></td>
+                                    <td>
+                                        <% if (ad.contract_type) { %>
+                                            <span class="job-badge job-badge-primary"><%= ad.contract_type %></span>
+                                        <% } else { %>
+                                            -
+                                        <% } %>
+                                    </td>
+                                    <td>
+                                        <span class="badge <%= ad.is_active ? 'badge-success' : 'badge-gray' %>">
+                                            <%= ad.is_active ? 'Active' : 'Inactive' %>
+                                        </span>
+                                    </td>
+                                    <td><%= new Date(ad.created_at).toLocaleDateString('fr-FR') %></td>
+                                    <td>
+                                        <div style="display: flex; gap: 0.5rem;">
+                                            <a href="/company/advertisements/<%= ad.id %>/edit" class="btn btn-outline btn-sm">
+                                                <i data-lucide="edit" style="width: 14px; height: 14px;"></i>
+                                            </a>
+                                            <form action="/company/advertisements/<%= ad.id %>/toggle" method="POST" style="display: inline;">
+                                                <button type="submit" class="btn <%= ad.is_active ? 'btn-outline' : 'btn-secondary' %> btn-sm">
+                                                    <i data-lucide="<%= ad.is_active ? 'eye-off' : 'eye' %>" style="width: 14px; height: 14px;"></i>
+                                                </button>
+                                            </form>
+                                            <form action="/company/advertisements/<%= ad.id %>/delete" method="POST" style="display: inline;" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette offre ?');">
+                                                <button type="submit" class="btn btn-outline btn-sm" style="color: var(--accent); border-color: var(--accent);">
+                                                    <i data-lucide="trash-2" style="width: 14px; height: 14px;"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            <% }); %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <% if (totalPages > 1) { %>
+                <%- include('../../partials/pagination') %>
+            <% } %>
+        <% } %>
+    </div>
+
+    <script src="/js/page-loader.js"></script>
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>
+

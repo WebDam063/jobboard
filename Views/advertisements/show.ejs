@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/css/utility.css">
+</head>
+<body class="bg-gray-50">
+    <%- include('../partials/header') %>
+    
+    <main class="min-h-screen py-8">
+        <%- include('../partials/flash-messages') %>
+        
+        <div class="container">
+            <div class="card">
+                <h1 class="text-3xl font-bold mb-4"><%= advertisement.title %></h1>
+                <p class="text-lg text-gray-600 mb-6"><%= advertisement.company_name %></p>
+                
+                <div class="flex gap-2 mb-6">
+                    <% if (advertisement.location) { %>
+                        <span class="badge badge-gray"><%= advertisement.location %></span>
+                    <% } %>
+                    <% if (advertisement.contract_type) { %>
+                        <span class="badge badge-primary"><%= advertisement.contract_type %></span>
+                    <% } %>
+                    <% if (advertisement.working_time) { %>
+                        <span class="badge badge-secondary"><%= advertisement.working_time %></span>
+                    <% } %>
+                </div>
+                
+                <div class="mb-6">
+                    <h2 class="text-xl font-semibold mb-3">Description du poste</h2>
+                    <p class="text-gray-700" style="white-space: pre-line;"><%= advertisement.full_description %></p>
+                </div>
+                
+                <% if (advertisement.salary_min || advertisement.salary_max) { %>
+                    <div class="mb-6">
+                        <h2 class="text-xl font-semibold mb-3">Rémunération</h2>
+                        <p class="text-gray-700">
+                            <% if (advertisement.salary_min && advertisement.salary_max) { %>
+                                <%= advertisement.salary_min %> € - <%= advertisement.salary_max %> € par an
+                            <% } else if (advertisement.salary_min) { %>
+                                À partir de <%= advertisement.salary_min %> € par an
+                            <% } else { %>
+                                Jusqu'à <%= advertisement.salary_max %> € par an
+                            <% } %>
+                        </p>
+                    </div>
+                <% } %>
+                
+                <div class="flex gap-4">
+                    <a href="/" class="btn btn-outline flex-1">Retour aux offres</a>
+                    <button onclick="showApplyForm(<%= advertisement.id %>)" class="btn btn-primary flex-1">Postuler</button>
+                </div>
+            </div>
+        </div>
+        
+        <div id="applyModal" class="hidden">
+            <div class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center p-4" onclick="closeApplyForm()">
+                <div class="bg-white rounded-lg p-8 max-w-2xl w-full overflow-auto" style="max-height: 90vh" onclick="event.stopPropagation()">
+                    <h2 class="text-2xl font-bold mb-6">Postuler à cette offre</h2>
+                    <form action="/applications" method="POST">
+                        <input type="hidden" name="advertisement_id" value="<%= advertisement.id %>">
+                        
+                        <% if (!user || user.role !== 'candidate') { %>
+                            <div class="form-group">
+                                <label class="form-label">Prénom</label>
+                                <input type="text" name="first_name" class="form-input" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Nom</label>
+                                <input type="text" name="last_name" class="form-input" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Email</label>
+                                <input type="email" name="email" class="form-input" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Téléphone</label>
+                                <input type="tel" name="phone" class="form-input" required>
+                            </div>
+                        <% } %>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Message de motivation</label>
+                            <textarea name="message" class="form-textarea" required></textarea>
+                        </div>
+                        
+                        <div class="flex gap-4">
+                            <button type="button" onclick="closeApplyForm()" class="btn btn-outline flex-1">Annuler</button>
+                            <button type="submit" class="btn btn-primary flex-1">Envoyer ma candidature</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <%- include('../partials/footer') %>
+    
+    <script src="/js/main.js"></script>
+</body>
+</html>
+

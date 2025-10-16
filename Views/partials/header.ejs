@@ -1,0 +1,31 @@
+<header class="bg-white shadow">
+    <nav class="container py-4">
+        <div class="flex justify-between items-center">
+            <a href="/" class="text-2xl font-bold text-primary">Job Board</a>
+            
+            <div class="flex gap-4 items-center">
+                <a href="/" class="text-gray-700 transition">Offres d'emploi</a>
+                
+                <% if (user) { %>
+                    <% if (user.role === 'candidate') { %>
+                        <a href="/applications/my-applications" class="text-gray-700 transition">Mes candidatures</a>
+                    <% } %>
+                    
+                    <% if (user.role === 'admin') { %>
+                        <a href="/admin" class="text-gray-700 transition">Administration</a>
+                    <% } %>
+                    
+                    <span class="text-gray-600"><%= user.email %></span>
+                    <a href="/auth/logout" class="btn btn-primary btn-sm">Déconnexion</a>
+                <% } else { %>
+                    <a href="/auth/login" class="btn btn-outline btn-sm">Connexion</a>
+                    <div class="flex gap-2">
+                        <a href="/auth/register/candidate" class="btn btn-primary btn-sm">Candidat</a>
+                        <a href="/auth/register/company" class="btn btn-secondary btn-sm">Entreprise</a>
+                    </div>
+                <% } %>
+            </div>
+        </div>
+    </nav>
+</header>
+

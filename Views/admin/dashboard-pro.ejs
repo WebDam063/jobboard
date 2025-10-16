@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/css/main.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+    <%- include('../partials/header-pro') %>
+    
+    <div class="main-content">
+        <% if (success) { %>
+            <div style="padding: 1rem 2rem; max-width: 1400px; margin: 0 auto;">
+                <div class="alert alert-success"><%= success %></div>
+            </div>
+        <% } %>
+        <% if (error) { %>
+            <div style="padding: 1rem 2rem; max-width: 1400px; margin: 0 auto;">
+                <div class="alert alert-error"><%= error %></div>
+            </div>
+        <% } %>
+        
+        <div class="container" style="padding: 3rem 2rem;">
+            <h1 style="font-size: 32px; font-weight: 700; margin-bottom: 0.5rem;">Tableau de bord</h1>
+            <p style="color: var(--gray-600); font-size: 16px; margin-bottom: 3rem;">Gérez votre plateforme Job Board</p>
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem;">
+                <a href="/admin/users" style="text-decoration: none;">
+                    <div class="card" style="padding: 2rem; transition: all var(--transition-base); border: 1px solid var(--gray-200);">
+                        <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+                            <div style="width: 48px; height: 48px; border-radius: 8px; background: rgba(69, 105, 144, 0.1); display: flex; align-items: center; justify-content: center;">
+                                <i data-lucide="users" style="width: 24px; height: 24px; color: var(--primary);"></i>
+                            </div>
+                            <h2 style="font-size: 20px; font-weight: 600; color: var(--gray-900);">Utilisateurs</h2>
+                        </div>
+                        <p style="color: var(--gray-600); font-size: 15px;">Gérer les comptes utilisateurs</p>
+                    </div>
+                </a>
+                
+                <a href="/admin/candidates" style="text-decoration: none;">
+                    <div class="card" style="padding: 2rem; transition: all var(--transition-base); border: 1px solid var(--gray-200);">
+                        <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+                            <div style="width: 48px; height: 48px; border-radius: 8px; background: rgba(73, 190, 170, 0.1); display: flex; align-items: center; justify-content: center;">
+                                <i data-lucide="user-check" style="width: 24px; height: 24px; color: var(--secondary);"></i>
+                            </div>
+                            <h2 style="font-size: 20px; font-weight: 600; color: var(--gray-900);">Candidats</h2>
+                        </div>
+                        <p style="color: var(--gray-600); font-size: 15px;">Gérer les profils candidats</p>
+                    </div>
+                </a>
+                
+                <a href="/admin/companies" style="text-decoration: none;">
+                    <div class="card" style="padding: 2rem; transition: all var(--transition-base); border: 1px solid var(--gray-200);">
+                        <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+                            <div style="width: 48px; height: 48px; border-radius: 8px; background: rgba(239, 118, 122, 0.1); display: flex; align-items: center; justify-content: center;">
+                                <i data-lucide="building-2" style="width: 24px; height: 24px; color: var(--accent);"></i>
+                            </div>
+                            <h2 style="font-size: 20px; font-weight: 600; color: var(--gray-900);">Entreprises</h2>
+                        </div>
+                        <p style="color: var(--gray-600); font-size: 15px;">Gérer les profils entreprises</p>
+                    </div>
+                </a>
+                
+                <a href="/admin/advertisements" style="text-decoration: none;">
+                    <div class="card" style="padding: 2rem; transition: all var(--transition-base); border: 1px solid var(--gray-200);">
+                        <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+                            <div style="width: 48px; height: 48px; border-radius: 8px; background: rgba(73, 220, 177, 0.1); display: flex; align-items: center; justify-content: center;">
+                                <i data-lucide="briefcase" style="width: 24px; height: 24px; color: var(--success);"></i>
+                            </div>
+                            <h2 style="font-size: 20px; font-weight: 600; color: var(--gray-900);">Annonces</h2>
+                        </div>
+                        <p style="color: var(--gray-600); font-size: 15px;">Gérer les offres d'emploi</p>
+                    </div>
+                </a>
+                
+                <a href="/admin/applications" style="text-decoration: none;">
+                    <div class="card" style="padding: 2rem; transition: all var(--transition-base); border: 1px solid var(--gray-200);">
+                        <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+                            <div style="width: 48px; height: 48px; border-radius: 8px; background: rgba(238, 184, 104, 0.1); display: flex; align-items: center; justify-content: center;">
+                                <i data-lucide="file-text" style="width: 24px; height: 24px; color: var(--warning);"></i>
+                            </div>
+                            <h2 style="font-size: 20px; font-weight: 600; color: var(--gray-900);">Candidatures</h2>
+                        </div>
+                        <p style="color: var(--gray-600); font-size: 15px;">Gérer les candidatures</p>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <script src="/js/page-loader.js"></script>
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>
+

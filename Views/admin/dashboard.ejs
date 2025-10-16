@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/css/utility.css">
+</head>
+<body class="bg-gray-50">
+    <%- include('../partials/header') %>
+    
+    <main class="min-h-screen py-8">
+        <%- include('../partials/flash-messages') %>
+        
+        <div class="container">
+            <h1 class="text-4xl font-bold mb-8">Tableau de bord - Administration</h1>
+            
+            <div class="grid grid-cols-2 gap-6">
+                <a href="/admin/users" class="card cursor-pointer">
+                    <h2 class="text-2xl font-semibold mb-2">Utilisateurs</h2>
+                    <p class="text-gray-600">Gérer les comptes utilisateurs</p>
+                </a>
+                
+                <a href="/admin/candidates" class="card cursor-pointer">
+                    <h2 class="text-2xl font-semibold mb-2">Candidats</h2>
+                    <p class="text-gray-600">Gérer les profils candidats</p>
+                </a>
+                
+                <a href="/admin/companies" class="card cursor-pointer">
+                    <h2 class="text-2xl font-semibold mb-2">Entreprises</h2>
+                    <p class="text-gray-600">Gérer les profils entreprises</p>
+                </a>
+                
+                <a href="/admin/advertisements" class="card cursor-pointer">
+                    <h2 class="text-2xl font-semibold mb-2">Annonces</h2>
+                    <p class="text-gray-600">Gérer les offres d'emploi</p>
+                </a>
+                
+                <a href="/admin/applications" class="card cursor-pointer">
+                    <h2 class="text-2xl font-semibold mb-2">Candidatures</h2>
+                    <p class="text-gray-600">Gérer les candidatures</p>
+                </a>
+            </div>
+        </div>
+    </main>
+    
+    <%- include('../partials/footer') %>
+</body>
+</html>
+

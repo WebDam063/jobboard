@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/css/main.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+    <%- include('../partials/header-pro') %>
+    
+    <div class="main-content">
+        <% if (success) { %>
+            <div style="padding: 1rem 2rem; max-width: 1400px; margin: 0 auto;">
+                <div class="alert alert-success"><%= success %></div>
+            </div>
+        <% } %>
+        <% if (error) { %>
+            <div style="padding: 1rem 2rem; max-width: 1400px; margin: 0 auto;">
+                <div class="alert alert-error"><%= error %></div>
+            </div>
+        <% } %>
+        
+        <div class="container" style="padding: 2rem;">
+            <div style="margin-bottom: 2rem;">
+                <h1 style="font-size: 28px; font-weight: 700; margin-bottom: 0.25rem;">Mes candidatures</h1>
+                <p style="color: var(--gray-600); font-size: 15px;">Suivez l'état de vos candidatures</p>
+            </div>
+            
+            <% if (applications.length === 0) { %>
+                <div style="background: var(--white); border: 1px solid var(--gray-200); border-radius: 8px; padding: 4rem 2rem; text-align: center;">
+                    <div style="width: 64px; height: 64px; border-radius: 50%; background: var(--gray-100); margin: 0 auto 1.5rem; display: flex; align-items: center; justify-content: center;">
+                        <i data-lucide="inbox" style="width: 32px; height: 32px; color: var(--gray-400);"></i>
+                    </div>
+                    <h3 style="font-size: 20px; font-weight: 600; margin-bottom: 0.5rem;">Aucune candidature</h3>
+                    <p style="color: var(--gray-600); margin-bottom: 2rem;">Vous n'avez envoyé aucune candidature pour le moment.</p>
+                    <a href="/" class="btn btn-primary">Voir les offres</a>
+                </div>
+            <% } else { %>
+                <div style="background: var(--white); border: 1px solid var(--gray-200); border-radius: 8px; overflow: hidden;">
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <thead style="background: var(--gray-50); border-bottom: 1px solid var(--gray-200);">
+                            <tr>
+                                <th style="padding: 1rem 1.5rem; text-align: left; font-size: 12px; font-weight: 600; color: var(--gray-600); text-transform: uppercase; letter-spacing: 0.5px;">Annonce</th>
+                                <th style="padding: 1rem 1.5rem; text-align: left; font-size: 12px; font-weight: 600; color: var(--gray-600); text-transform: uppercase; letter-spacing: 0.5px;">Entreprise</th>
+                                <th style="padding: 1rem 1.5rem; text-align: left; font-size: 12px; font-weight: 600; color: var(--gray-600); text-transform: uppercase; letter-spacing: 0.5px;">Date</th>
+                                <th style="padding: 1rem 1.5rem; text-align: left; font-size: 12px; font-weight: 600; color: var(--gray-600); text-transform: uppercase; letter-spacing: 0.5px;">Statut</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% applications.forEach((app) => { %>
+                                <tr style="border-bottom: 1px solid var(--gray-200);">
+                                    <td style="padding: 1rem 1.5rem; font-size: 15px; color: var(--gray-900); font-weight: 500;"><%= app.advertisement_title %></td>
+                                    <td style="padding: 1rem 1.5rem; font-size: 15px; color: var(--gray-700);"><%= app.company_name %></td>
+                                    <td style="padding: 1rem 1.5rem; font-size: 15px; color: var(--gray-700);"><%= new Date(app.created_at).toLocaleDateString('fr-FR') %></td>
+                                    <td style="padding: 1rem 1.5rem;">
+                                        <span class="job-badge <%= app.status === 'pending' ? '' : app.status === 'accepted' ? 'job-badge-secondary' : app.status === 'reviewed' ? 'job-badge-primary' : 'job-badge-accent' %>" style="background: <%= app.status === 'pending' ? 'rgba(238, 184, 104, 0.1)' : '' %>; color: <%= app.status === 'pending' ? 'var(--warning)' : '' %>;">
+                                            <i data-lucide="<%= app.status === 'pending' ? 'clock' : app.status === 'accepted' ? 'check-circle' : app.status === 'reviewed' ? 'eye' : 'x-circle' %>" style="width: 14px; height: 14px;"></i>
+                                            <%= app.status === 'pending' ? 'En attente' : app.status === 'accepted' ? 'Acceptée' : app.status === 'reviewed' ? 'Examinée' : 'Refusée' %>
+                                        </span>
+                                    </td>
+                                </tr>
+                            <% }) %>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <% if (totalPages > 1) { %>
+                    <div style="display: flex; justify-content: center; gap: 0.5rem; margin-top: 2rem;">
+                        <% if (currentPage > 1) { %>
+                            <a href="?page=<%= currentPage - 1 %>" class="btn btn-outline btn-sm">Précédent</a>
+                        <% } %>
+                        
+                        <% for (let i = 1; i <= totalPages; i++) { %>
+                            <% if (i === currentPage) { %>
+                                <span class="btn btn-primary btn-sm"><%= i %></span>
+                            <% } else if (Math.abs(i - currentPage) <= 2 || i === 1 || i === totalPages) { %>
+                                <a href="?page=<%= i %>" class="btn btn-outline btn-sm"><%= i %></a>
+                            <% } else if (Math.abs(i - currentPage) === 3) { %>
+                                <span style="padding: 0 0.5rem; color: var(--gray-500);">...</span>
+                            <% } %>
+                        <% } %>
+                        
+                        <% if (currentPage < totalPages) { %>
+                            <a href="?page=<%= currentPage + 1 %>" class="btn btn-outline btn-sm">Suivant</a>
+                        <% } %>
+                    </div>
+                <% } %>
+            <% } %>
+        </div>
+    </div>
+    
+    <script src="/js/page-loader.js"></script>
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>
+

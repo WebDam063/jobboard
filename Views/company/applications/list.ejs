@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/css/main.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+    <%- include('../../partials/header-pro') %>
+    
+    <div class="container" style="padding: 2rem;">
+        <div class="dashboard-header" style="margin-bottom: 2rem;">
+            <h1 style="font-size: 32px; font-weight: 700; color: var(--gray-900); margin-bottom: 0.5rem;">
+                Candidatures reçues
+            </h1>
+            <p style="color: var(--gray-600); font-size: 16px;">
+                Consultez et gérez les candidatures pour vos offres
+            </p>
+        </div>
+
+        <% if (success) { %>
+            <div class="alert alert-success" style="margin-bottom: 2rem;"><%= success %></div>
+        <% } %>
+        <% if (error) { %>
+            <div class="alert alert-error" style="margin-bottom: 2rem;"><%= error %></div>
+        <% } %>
+
+        <!-- Filtres -->
+        <div style="margin-bottom: 2rem; display: flex; gap: 1rem; flex-wrap: wrap;">
+            <a href="/company/applications" class="btn <%= filterStatus === '' ? 'btn-primary' : 'btn-outline' %> btn-sm">
+                Toutes
+            </a>
+            <a href="/company/applications?status=pending" class="btn <%= filterStatus === 'pending' ? 'btn-primary' : 'btn-outline' %> btn-sm">
+                <i data-lucide="clock" style="width: 14px; height: 14px;"></i>
+                En attente
+            </a>
+            <a href="/company/applications?status=accepted" class="btn <%= filterStatus === 'accepted' ? 'btn-primary' : 'btn-outline' %> btn-sm">
+                <i data-lucide="check-circle" style="width: 14px; height: 14px;"></i>
+                Acceptées
+            </a>
+            <a href="/company/applications?status=rejected" class="btn <%= filterStatus === 'rejected' ? 'btn-primary' : 'btn-outline' %> btn-sm">
+                <i data-lucide="x-circle" style="width: 14px; height: 14px;"></i>
+                Refusées
+            </a>
+        </div>
+
+        <% if (applications.length === 0) { %>
+            <div class="card" style="text-align: center; padding: 4rem 2rem;">
+                <i data-lucide="users" style="width: 64px; height: 64px; color: var(--gray-300); margin: 0 auto 1rem;"></i>
+                <h2 style="font-size: 24px; font-weight: 600; color: var(--gray-900); margin-bottom: 0.5rem;">
+                    Aucune candidature
+                </h2>
+                <p style="color: var(--gray-600);">
+                    Vous n'avez pas encore reçu de candidatures pour vos offres
+                </p>
+            </div>
+        <% } else { %>
+            <div class="card">
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Candidat</th>
+                                <th>Offre</th>
+                                <th>Contact</th>
+                                <th>Statut</th>
+                                <th>Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% applications.forEach(app => { %>
+                                <tr>
+                                    <td>
+                                        <div style="font-weight: 600; color: var(--gray-900);"><%= app.first_name %> <%= app.last_name %></div>
+                                    </td>
+                                    <td>
+                                        <div style="font-size: 14px; color: var(--gray-700);"><%= app.advertisement_title %></div>
+                                    </td>
+                                    <td>
+                                        <div style="font-size: 14px; color: var(--gray-600);">
+                                            <div><%= app.email %></div>
+                                            <div><%= app.phone || '-' %></div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="badge <%= app.status === 'pending' ? 'badge-warning' : app.status === 'accepted' ? 'badge-success' : 'badge-error' %>">
+                                            <%= app.status === 'pending' ? 'En attente' : app.status === 'accepted' ? 'Acceptée' : 'Refusée' %>
+                                        </span>
+                                    </td>
+                                    <td><%= new Date(app.created_at).toLocaleDateString('fr-FR') %></td>
+                                    <td>
+                                        <a href="/company/applications/<%= app.id %>" class="btn btn-outline btn-sm">
+                                            <i data-lucide="eye" style="width: 14px; height: 14px;"></i>
+                                            Voir
+                                        </a>
+                                    </td>
+                                </tr>
+                            <% }); %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <% if (totalPages > 1) { %>
+                <%- include('../../partials/pagination') %>
+            <% } %>
+        <% } %>
+    </div>
+
+    <script src="/js/page-loader.js"></script>
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>
+

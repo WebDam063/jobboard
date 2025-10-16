@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/css/main.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+    <%- include('../partials/header-pro') %>
+    
+    <div class="main-content">
+        <% if (success) { %>
+            <div style="padding: 1rem 2rem; max-width: 1200px; margin: 0 auto;">
+                <div class="alert alert-success"><%= success %></div>
+            </div>
+        <% } %>
+        <% if (error) { %>
+            <div style="padding: 1rem 2rem; max-width: 1200px; margin: 0 auto;">
+                <div class="alert alert-error"><%= error %></div>
+            </div>
+        <% } %>
+        
+        <div style="max-width: 1200px; margin: 0 auto; padding: 2rem;">
+            <!-- Breadcrumb -->
+            <nav style="margin-bottom: 2rem;">
+                <a href="/" style="color: var(--gray-600); font-size: 14px; transition: color var(--transition-fast);">
+                    <i data-lucide="arrow-left" style="width: 14px; height: 14px; display: inline-block; vertical-align: middle;"></i>
+                    Retour aux offres
+                </a>
+            </nav>
+            
+            <!-- Main Content -->
+            <div style="background: var(--white); border: 1px solid var(--gray-200); border-radius: 8px; padding: 3rem;">
+                <!-- Header -->
+                <div class="job-details-header">
+                    <h1 class="job-details-title"><%= advertisement.title %></h1>
+                    <p class="job-details-company"><%= advertisement.company_name %></p>
+                    <div class="job-details-meta">
+                        <% if (advertisement.location) { %>
+                            <span class="job-badge">
+                                <i data-lucide="map-pin" style="width: 14px; height: 14px;"></i>
+                                <%= advertisement.location %>
+                            </span>
+                        <% } %>
+                        <% if (advertisement.contract_type) { %>
+                            <span class="job-badge job-badge-primary">
+                                <i data-lucide="briefcase" style="width: 14px; height: 14px;"></i>
+                                <%= advertisement.contract_type %>
+                            </span>
+                        <% } %>
+                        <% if (advertisement.working_time) { %>
+                            <span class="job-badge job-badge-secondary">
+                                <i data-lucide="clock" style="width: 14px; height: 14px;"></i>
+                                <%= advertisement.working_time %>
+                            </span>
+                        <% } %>
+                    </div>
+                </div>
+                
+                <!-- Actions -->
+                <div class="job-details-actions">
+                    <button class="btn btn-primary btn-lg" onclick="showApplyModal()">
+                        <i data-lucide="send" style="width: 18px; height: 18px;"></i>
+                        Postuler à cette offre
+                    </button>
+                </div>
+                
+                <!-- Description -->
+                <div class="job-details-section">
+                    <h2 class="job-details-section-title">
+                        <i data-lucide="file-text" style="width: 20px; height: 20px; display: inline-block; vertical-align: middle; margin-right: 0.5rem;"></i>
+                        Description du poste
+                    </h2>
+                    <div class="job-details-section-content"><%= advertisement.full_description %></div>
+                </div>
+                
+                <!-- Salary -->
+                <% if (advertisement.salary_min || advertisement.salary_max) { %>
+                    <div class="job-details-section">
+                        <h2 class="job-details-section-title">
+                            <i data-lucide="banknote" style="width: 20px; height: 20px; display: inline-block; vertical-align: middle; margin-right: 0.5rem;"></i>
+                            Rémunération
+                        </h2>
+                        <div class="job-details-section-content">
+                            <% if (advertisement.salary_min && advertisement.salary_max) { %>
+                                <%= advertisement.salary_min.toLocaleString('fr-FR') %> € - <%= advertisement.salary_max.toLocaleString('fr-FR') %> € par an
+                            <% } else if (advertisement.salary_min) { %>
+                                À partir de <%= advertisement.salary_min.toLocaleString('fr-FR') %> € par an
+                            <% } else { %>
+                                Jusqu'à <%= advertisement.salary_max.toLocaleString('fr-FR') %> € par an
+                            <% } %>
+                        </div>
+                    </div>
+                <% } %>
+                
+                <!-- Company Info -->
+                <% if (advertisement.company_name) { %>
+                    <div class="job-details-section" style="background: var(--gray-50); padding: 1.5rem; border-radius: 8px; border: 1px solid var(--gray-200);">
+                        <h2 class="job-details-section-title" style="margin-bottom: 0.5rem;">
+                            <i data-lucide="building-2" style="width: 20px; height: 20px; display: inline-block; vertical-align: middle; margin-right: 0.5rem;"></i>
+                            À propos de l'entreprise
+                        </h2>
+                        <p style="font-size: 18px; font-weight: 600; color: var(--gray-900);"><%= advertisement.company_name %></p>
+                    </div>
+                <% } %>
+                
+                <!-- CTA Bottom -->
+                <div style="margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--gray-200); text-align: center;">
+                    <h3 style="font-size: 20px; font-weight: 600; margin-bottom: 1rem; color: var(--gray-900);">
+                        Intéressé par cette offre ?
+                    </h3>
+                    <button class="btn btn-primary btn-lg" onclick="showApplyModal()">
+                        <i data-lucide="send" style="width: 18px; height: 18px;"></i>
+                        Postuler maintenant
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal de candidature -->
+    <div id="applyModal" class="hidden">
+        <div class="modal-overlay" onclick="closeApplyModal()">
+            <div class="modal-container" onclick="event.stopPropagation()">
+                <div class="modal-header">
+                    <h2 class="modal-title">Postuler à cette offre</h2>
+                    <p style="color: var(--gray-600); font-size: 15px; margin-top: 0.5rem;">
+                        <%= advertisement.title %> - <%= advertisement.company_name %>
+                    </p>
+                </div>
+                <form action="/applications" method="POST">
+                    <input type="hidden" name="advertisement_id" value="<%= advertisement.id %>">
+                    
+                    <% if (!user || user.role !== 'candidate') { %>
+                        <div class="form-group">
+                            <label class="form-label">Prénom *</label>
+                            <input type="text" name="first_name" class="form-input" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Nom *</label>
+                            <input type="text" name="last_name" class="form-input" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Email *</label>
+                            <input type="email" name="email" class="form-input" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Téléphone *</label>
+                            <input type="tel" name="phone" class="form-input" required>
+                        </div>
+                    <% } else { %>
+                        <div style="background: rgba(73, 220, 177, 0.1); border: 1px solid rgba(73, 220, 177, 0.3); border-radius: 6px; padding: 1rem; margin-bottom: 1.5rem;">
+                            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+                                <i data-lucide="check-circle" style="width: 18px; height: 18px; color: var(--success);"></i>
+                                <p style="font-weight: 600; color: var(--success);">Vous êtes connecté</p>
+                            </div>
+                            <p style="font-size: 14px; color: var(--gray-700);">
+                                Vos informations seront automatiquement renseignées
+                            </p>
+                        </div>
+                    <% } %>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Message de motivation *</label>
+                        <textarea name="message" class="form-textarea" placeholder="Expliquez pourquoi vous êtes le candidat idéal pour ce poste..." required></textarea>
+                    </div>
+                    
+                    <div class="modal-actions">
+                        <button type="button" onclick="closeApplyModal()" class="btn btn-outline w-full">
+                            <i data-lucide="x" style="width: 16px; height: 16px;"></i>
+                            Annuler
+                        </button>
+                        <button type="submit" class="btn btn-primary w-full">
+                            <i data-lucide="send" style="width: 16px; height: 16px;"></i>
+                            Envoyer ma candidature
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <script src="/js/page-loader.js"></script>
+    <script>
+        lucide.createIcons();
+        
+        function showApplyModal() {
+            document.getElementById('applyModal').classList.remove('hidden');
+        }
+        
+        function closeApplyModal() {
+            document.getElementById('applyModal').classList.add('hidden');
+        }
+        
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeApplyModal();
+            }
+        });
+    </script>
+</body>
+</html>
+
